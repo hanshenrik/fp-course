@@ -1,14 +1,14 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Course.Functor where
 
 import Course.Core
 import Course.ExactlyOne
-import Course.Optional
 import Course.List
-import qualified Prelude as P(fmap)
+import Course.Optional
+import qualified Prelude as P (fmap)
 
 -- | All instances of the `Functor` type-class must satisfy two laws. These laws
 -- are not checked by the compiler. These laws are given as:
@@ -21,9 +21,9 @@ import qualified Prelude as P(fmap)
 class Functor k where
   -- Pronounced, eff-map.
   (<$>) ::
-    (a -> b)
-    -> k a
-    -> k b
+    (a -> b) ->
+    k a ->
+    k b
 
 infixl 4 <$>
 
@@ -38,11 +38,11 @@ infixl 4 <$>
 -- ExactlyOne 3
 instance Functor ExactlyOne where
   (<$>) ::
-    (a -> b)
-    -> ExactlyOne a
-    -> ExactlyOne b
-  (<$>) =
-    error "todo: Course.Functor (<$>)#instance ExactlyOne"
+    (a -> b) ->
+    ExactlyOne a ->
+    ExactlyOne b
+  (<$>) f =
+    ExactlyOne . f . runExactlyOne
 
 -- | Maps a function on the List functor.
 --
@@ -53,11 +53,11 @@ instance Functor ExactlyOne where
 -- [2,3,4]
 instance Functor List where
   (<$>) ::
-    (a -> b)
-    -> List a
-    -> List b
+    (a -> b) ->
+    List a ->
+    List b
   (<$>) =
-    error "todo: Course.Functor (<$>)#instance List"
+    map
 
 -- | Maps a function on the Optional functor.
 --
@@ -68,11 +68,11 @@ instance Functor List where
 -- Full 3
 instance Functor Optional where
   (<$>) ::
-    (a -> b)
-    -> Optional a
-    -> Optional b
+    (a -> b) ->
+    Optional a ->
+    Optional b
   (<$>) =
-    error "todo: Course.Functor (<$>)#instance Optional"
+    mapOptional
 
 -- | Maps a function on the reader ((->) t) functor.
 --
@@ -80,11 +80,11 @@ instance Functor Optional where
 -- 17
 instance Functor ((->) t) where
   (<$>) ::
-    (a -> b)
-    -> ((->) t a)
-    -> ((->) t b)
+    (a -> b) ->
+    (t -> a) ->
+    (t -> b)
   (<$>) =
-    error "todo: Course.Functor (<$>)#((->) t)"
+    (.)
 
 -- | Anonymous map. Maps a constant value on a functor.
 --
@@ -96,11 +96,12 @@ instance Functor ((->) t) where
 -- prop> \x q -> x <$ Full q == Full x
 (<$) ::
   Functor k =>
-  a
-  -> k b
-  -> k a
-(<$) =
-  error "todo: Course.Functor#(<$)"
+  a ->
+  k b ->
+  k a
+(<$) a =
+  -- const a <$> kb
+  (<$>) (const a)
 
 -- | Anonymous map producing unit value.
 --
@@ -117,10 +118,13 @@ instance Functor ((->) t) where
 -- ()
 void ::
   Functor k =>
-  k a
-  -> k ()
+  k a ->
+  k ()
 void =
-  error "todo: Course.Functor#void"
+  -- const () <$> ka
+  (<$) ()
+
+-- hvordan kom han frem til '<$> kb' og '<$> ka' så fort?
 
 -----------------------
 -- SUPPORT LIBRARIES --
