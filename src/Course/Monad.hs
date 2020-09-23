@@ -138,8 +138,8 @@ join ::
   Monad k =>
   k (k a) ->
   k a
-join =
-  error "todo: Course.Monad#join"
+join kka =
+  id =<< kka
 
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
@@ -152,8 +152,8 @@ join =
   k a ->
   (a -> k b) ->
   k b
-(>>=) =
-  error "todo: Course.Monad#(>>=)"
+(>>=) ka akb =
+  join (akb <$> ka)
 
 infixl 1 >>=
 
@@ -168,8 +168,9 @@ infixl 1 >>=
   (a -> k b) ->
   a ->
   k c
-(<=<) =
-  error "todo: Course.Monad#(<=<)"
+(<=<) bkc akb a =
+  -- join (bkc <$> akb a)
+  bkc =<< akb a
 
 infixr 1 <=<
 
